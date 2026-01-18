@@ -47,11 +47,12 @@ Since this is a standalone frontend application, no installation (`npm`, `pip`, 
 
 ## 📂 Project Structure
 
-```text
+``` text
 /
 ├── index.html        # The entire application (Logic + UI)
 ├── README.md         # Documentation
 └── screenshot.png    # (Optional) Preview image
+```
 
 ## 🌐 Deployment
 
