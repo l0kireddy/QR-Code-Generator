@@ -15,49 +15,45 @@
     }
 
     body{
-      height:100vh;
+      min-height:100vh;
       display:flex;
       justify-content:center;
       align-items:center;
       background:#000;
       color:#fff;
-      padding:20px;
+      padding:22px;
     }
 
     .wrap{
       width:100%;
-      max-width:480px;
-    }
-
-    .title{
-      font-size:14px;
-      font-weight:600;
-      letter-spacing:0.6px;
-      margin-bottom:6px;
-    }
-
-    .sub{
-      font-size:12px;
-      opacity:0.6;
-      margin-bottom:16px;
-      line-height:1.4;
-    }
-
-    .inputRow{
+      max-width:420px;
       display:flex;
-      gap:10px;
-      align-items:center;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    h1{
+      font-size:28px;
+      font-weight:700;
+      letter-spacing:1px;
+      line-height:1.1;
+    }
+
+    p{
+      font-size:13px;
+      opacity:0.6;
+      line-height:1.5;
     }
 
     input{
-      flex:1;
-      padding:12px 12px;
-      border-radius:10px;
+      width:100%;
+      padding:14px;
+      border-radius:12px;
       border:1px solid rgba(255,255,255,0.14);
-      outline:none;
       background:transparent;
       color:#fff;
-      font-size:12px;
+      outline:none;
+      font-size:13px;
     }
 
     input::placeholder{
@@ -65,49 +61,133 @@
     }
 
     button{
-      padding:12px 14px;
-      border-radius:10px;
+      width:100%;
+      padding:14px;
+      border-radius:12px;
       border:1px solid rgba(255,255,255,0.14);
-      cursor:pointer;
       background:transparent;
       color:#fff;
-      font-size:12px;
+      font-size:13px;
+      cursor:pointer;
       transition:0.15s;
-      white-space:nowrap;
     }
 
     button:hover{
-      background:rgba(255,255,255,0.06);
-    }
-
-    button:active{
-      transform:scale(0.99);
+      background: rgba(255,255,255,0.06);
     }
 
     .qrbox{
-      margin-top:16px;
-      padding:14px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,0.12);
       display:none;
-    }
-
-    .qrhead{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:12px;
-      font-size:12px;
-      opacity:0.75;
-    }
-
-    .pill{
-      font-size:11px;
-      padding:4px 8px;
-      border-radius:999px;
+      padding:14px;
+      border-radius:14px;
       border:1px solid rgba(255,255,255,0.14);
-      opacity:0.8;
+      background: rgba(255,255,255,0.03);
     }
+
+    .qrimg{
+      width:100%;
+      display:flex;
+      justify-content:center;
+      padding:12px;
+      border-radius:12px;
+      border:1px dashed rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.02);
+    }
+
+    img{
+      width:180px;
+      max-width:100%;
+      background:#fff;
+      padding:10px;
+      border-radius:10px;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    a{
+      flex:1;
+      text-align:center;
+      padding:12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.14);
+      text-decoration:none;
+      color:#fff;
+      font-size:13px;
+      transition:0.15s;
+    }
+
+    a:hover{
+      background: rgba(255,255,255,0.06);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div>
+      <h1>QR<br>Generator</h1>
+      <p>Enter any text or URL to generate a QR code.</p>
+    </div>
+
+    <input id="textInput" placeholder="Enter text or URL..." />
+    <button onclick="generateQR()">Generate</button>
+
+    <div class="qrbox" id="qrBox">
+      <div class="qrimg">
+        <img id="qrImg" src="" alt="QR Code">
+      </div>
+
+      <div class="actions">
+        <a id="downloadBtn" href="#" download="qrcode.png">Download</a>
+        <a href="#" onclick="resetQR(); return false;">Clear</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = "https://qr-code-generator-j1og.onrender.com";
+
+    async function generateQR() {
+      const text = document.getElementById("textInput").value.trim();
+
+      if (!text) {
+        alert("Please enter text or a URL.");
+        return;
+      }
+
+      try {
+        const res = await fetch(BACKEND_URL + "/api/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text })
+        });
+
+        if (!res.ok) throw new Error("QR generation failed");
+
+        const blob = await res.blob();
+        const imgUrl = URL.createObjectURL(blob);
+
+        document.getElementById("qrImg").src = imgUrl;
+        document.getElementById("downloadBtn").href = imgUrl;
+        document.getElementById("qrBox").style.display = "block";
+      } catch (e) {
+        alert("Backend not reachable.");
+      }
+    }
+
+    function resetQR(){
+      document.getElementById("qrBox").style.display = "none";
+      document.getElementById("qrImg").src = "";
+      document.getElementById("downloadBtn").href = "#";
+      document.getElementById("textInput").value = "";
+    }
+  </script>
+</body>
+</html>
 
     .qrimgWrap{
       display:flex;
