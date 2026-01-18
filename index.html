@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QR Gen</title>
+  <title>QR Gen HD</title>
   
   <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
 
@@ -30,7 +30,7 @@
     /* --- CONTAINER --- */
     .container {
       width: 100%;
-      max-width: 340px; /* Kept narrow for a fixed feel */
+      max-width: 340px;
       display: flex;
       flex-direction: column;
       gap: 18px;
@@ -71,7 +71,7 @@
       padding: 12px;
       width: 100%;
       outline: none;
-      border-radius: 4px; /* Sharper corners for mono look */
+      border-radius: 4px;
     }
 
     input:focus, select:focus {
@@ -102,7 +102,6 @@
       transform: translateY(2px);
     }
 
-    /* Secondary outline button */
     .btn-outline {
       background: transparent;
       color: #fff;
@@ -116,7 +115,7 @@
 
     /* --- QR OUTPUT --- */
     #qr-section {
-      display: none; /* Hidden by default */
+      display: none; 
       flex-direction: column;
       gap: 15px;
       margin-top: 10px;
@@ -126,14 +125,21 @@
 
     /* FIXED SIZE CONTAINER */
     #canvas-container {
-      width: 220px;     /* FIXED WIDTH */
-      height: 220px;    /* FIXED HEIGHT */
-      margin: 0 auto;   /* Center it */
+      width: 220px;     /* Visually kept at medium size */
+      height: 220px;
+      margin: 0 auto;
       border: 1px solid #222;
       display: flex;
       justify-content: center;
       align-items: center;
       background: #000;
+      overflow: hidden; /* Ensures no overflow */
+    }
+
+    /* KEY FIX: Force the High-Res Canvas to fit the container */
+    #canvas-container canvas {
+      width: 220px !important;
+      height: 220px !important;
     }
 
     .actions {
@@ -151,8 +157,8 @@
 
   <div class="container">
     <div>
-      <h1>QR_Generator</h1>
-      <p>// Enter details below to execute.</p>
+      <h1>QR_Generator_HD</h1>
+      <p>// High resolution rendering enabled.</p>
     </div>
 
     <div>
@@ -175,7 +181,7 @@
       <div id="canvas-container"></div>
       
       <div class="actions">
-        <button class="btn-outline" onclick="downloadQR()">[DOWNLOAD]</button>
+        <button class="btn-outline" onclick="downloadQR()">[DOWNLOAD PNG]</button>
         <button class="btn-outline" onclick="resetApp()">[RESET]</button>
       </div>
     </div>
@@ -198,14 +204,13 @@
         return;
       }
 
-      // 1. Clear previous
       qrContainer.innerHTML = "";
 
-      // 2. Configure QR
-      // Fixed size: 220x220
+      // GENERATING AT HIGH RESOLUTION (1000px)
+      // This solves the blurriness
       qrCode = new QRCodeStyling({
-        width: 220,
-        height: 220,
+        width: 1000,  // High Quality
+        height: 1000, // High Quality
         type: "canvas",
         data: text,
         margin: 0,
@@ -229,14 +234,14 @@
         }
       });
 
-      // 3. Render
       qrCode.append(qrContainer);
       qrSection.style.display = "flex";
     }
 
     function downloadQR() {
       if(qrCode) {
-        qrCode.download({ name: "qr_code", extension: "png" });
+        // Downloads the 1000px High Res version
+        qrCode.download({ name: "qr_code_hd", extension: "png" });
       }
     }
 
@@ -246,7 +251,6 @@
       qrContainer.innerHTML = "";
     }
     
-    // Allow 'Enter' key to trigger generation
     textInput.addEventListener("keypress", (e) => {
       if(e.key === "Enter") generateQR();
     });
