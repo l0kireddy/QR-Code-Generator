@@ -89,4 +89,4 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 > **Note:** This tool uses `qr-code-styling` under the hood. All rendering happens locally in the browser.
 >
-> *Built with 🟢 and ☕ by [Your Name]*
+> *Built with 🟢 and ☕ by L0kireddy.*
