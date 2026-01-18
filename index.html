@@ -3,397 +3,208 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QR Generator</title>
+  <title>Minimal QR</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-                   "Liberation Mono", "Courier New", monospace;
+    /* RESET & BASE */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    body{
-      min-height:100vh;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      background:#000;
-      color:#fff;
-      padding:22px;
+    body {
+      background-color: #000;
+      color: #fff;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
     }
 
-    .wrap{
-      width:100%;
-      max-width:420px;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
+    /* CONTAINER */
+    .container {
+      width: 100%;
+      max-width: 350px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
-    h1{
-      font-size:28px;
-      font-weight:700;
-      letter-spacing:1px;
-      line-height:1.1;
+    /* TEXT ELEMENTS */
+    h1 {
+      font-weight: 200; /* Thin font for minimalism */
+      font-size: 2rem;
+      letter-spacing: -1px;
+      margin-bottom: 5px;
     }
 
-    p{
-      font-size:13px;
-      opacity:0.6;
-      line-height:1.5;
+    p {
+      color: #888;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
     }
 
-    input{
-      width:100%;
-      padding:14px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,0.14);
-      background:transparent;
-      color:#fff;
-      outline:none;
-      font-size:13px;
+    /* INPUT FIELD */
+    input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid #333;
+      color: #fff;
+      font-size: 1rem;
+      padding: 15px 0;
+      width: 100%;
+      outline: none;
+      transition: 0.3s;
+      border-radius: 0;
     }
 
-    input::placeholder{
-      color: rgba(255,255,255,0.35);
+    input:focus {
+      border-bottom: 1px solid #fff;
     }
 
-    button{
-      width:100%;
-      padding:14px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,0.14);
-      background:transparent;
-      color:#fff;
-      font-size:13px;
-      cursor:pointer;
-      transition:0.15s;
+    /* BUTTONS */
+    button, .btn-link {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 14px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: opacity 0.2s;
+      text-align: center;
+      text-decoration: none;
+      display: block;
     }
 
-    button:hover{
-      background: rgba(255,255,255,0.06);
+    button:hover, .btn-link:hover {
+      opacity: 0.8;
     }
 
-    .qrbox{
-      display:none;
-      padding:14px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.03);
+    button:active {
+      transform: scale(0.98);
     }
 
-    .qrimg{
-      width:100%;
-      display:flex;
-      justify-content:center;
-      padding:12px;
-      border-radius:12px;
-      border:1px dashed rgba(255,255,255,0.18);
-      background: rgba(255,255,255,0.02);
+    /* QR OUTPUT AREA */
+    #qr-container {
+      margin-top: 10px;
+      display: none; /* Hidden by default */
+      flex-direction: column;
+      gap: 15px;
+      animation: fadeIn 0.5s ease;
     }
 
-    img{
-      width:180px;
-      max-width:100%;
-      background:#fff;
-      padding:10px;
-      border-radius:10px;
+    #qrcode {
+      background: #fff;
+      padding: 15px; /* Quiet zone for scanner readability */
+      border-radius: 4px;
+      display: flex;
+      justify-content: center;
     }
 
-    .actions{
-      display:flex;
-      gap:10px;
-      margin-top:12px;
+    /* Clear Button Style */
+    .btn-clear {
+      background: transparent;
+      color: #555;
+      font-weight: 400;
+      margin-top: 5px;
+    }
+    .btn-clear:hover {
+      color: #fff;
+      background: transparent;
     }
 
-    a{
-      flex:1;
-      text-align:center;
-      padding:12px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,0.14);
-      text-decoration:none;
-      color:#fff;
-      font-size:13px;
-      transition:0.15s;
-    }
-
-    a:hover{
-      background: rgba(255,255,255,0.06);
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
-
 <body>
-  <div class="wrap">
+
+  <div class="container">
     <div>
-      <h1>QR<br>Generator</h1>
-      <p>Enter any text or URL to generate a QR code.</p>
+      <h1>QR Generator.</h1>
+      <p>Simple. Instant. Minimal.</p>
     </div>
 
-    <input id="textInput" placeholder="Enter text or URL..." />
-    <button onclick="generateQR()">Generate</button>
+    <input type="text" id="text-input" placeholder="Paste link or text here..." autocomplete="off">
+    
+    <button onclick="generateQR()">Create QR Code</button>
 
-    <div class="qrbox" id="qrBox">
-      <div class="qrimg">
-        <img id="qrImg" src="" alt="QR Code">
-      </div>
-
-      <div class="actions">
-        <a id="downloadBtn" href="#" download="qrcode.png">Download</a>
-        <a href="#" onclick="resetQR(); return false;">Clear</a>
-      </div>
+    <div id="qr-container">
+      <div id="qrcode"></div>
+      
+      <a id="download-link" class="btn-link" download="qrcode.png">Download PNG</a>
+      <button class="btn-clear" onclick="resetUI()">Reset</button>
     </div>
   </div>
 
   <script>
-    const BACKEND_URL = "https://qr-code-generator-j1og.onrender.com";
+    const qrContainer = document.getElementById("qrcode");
+    const containerDiv = document.getElementById("qr-container");
+    const inputField = document.getElementById("text-input");
+    const downloadLink = document.getElementById("download-link");
+    let qrcode = null;
 
-    async function generateQR() {
-      const text = document.getElementById("textInput").value.trim();
+    function generateQR() {
+      const text = inputField.value.trim();
 
       if (!text) {
-        alert("Please enter text or a URL.");
+        inputField.style.borderBottom = "1px solid red";
+        setTimeout(() => inputField.style.borderBottom = "1px solid #333", 1000);
         return;
       }
 
-      try {
-        const res = await fetch(BACKEND_URL + "/api/generate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text })
-        });
+      // Clear previous QR
+      qrContainer.innerHTML = "";
+      
+      // Generate new QR using the library
+      qrcode = new QRCode(qrContainer, {
+        text: text,
+        width: 250,
+        height: 250,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.H
+      });
 
-        if (!res.ok) throw new Error("QR generation failed");
+      // Show the container
+      containerDiv.style.display = "flex";
 
-        const blob = await res.blob();
-        const imgUrl = URL.createObjectURL(blob);
+      // Wait a moment for canvas to draw, then set download link
+      setTimeout(() => {
+        const canvas = qrContainer.querySelector("canvas");
+        const img = qrContainer.querySelector("img");
+        
+        // Sometimes the library outputs an IMG, sometimes Canvas depending on browser support
+        if(img && img.src) {
+           downloadLink.href = img.src;
+        } else if (canvas) {
+           downloadLink.href = canvas.toDataURL("image/png");
+        }
+      }, 100);
+    }
 
-        document.getElementById("qrImg").src = imgUrl;
-        document.getElementById("downloadBtn").href = imgUrl;
-        document.getElementById("qrBox").style.display = "block";
-      } catch (e) {
-        alert("Backend not reachable.");
+    function resetUI() {
+      inputField.value = "";
+      containerDiv.style.display = "none";
+      qrContainer.innerHTML = "";
+    }
+    
+    // Allow pressing "Enter" to generate
+    inputField.addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        generateQR();
       }
-    }
-
-    function resetQR(){
-      document.getElementById("qrBox").style.display = "none";
-      document.getElementById("qrImg").src = "";
-      document.getElementById("downloadBtn").href = "#";
-      document.getElementById("textInput").value = "";
-    }
-  </script>
-</body>
-</html>
-
-    .qrimgWrap{
-      display:flex;
-      justify-content:center;
-      padding:12px;
-      border-radius:10px;
-      background:rgba(255,255,255,0.03);
-      border:1px dashed rgba(255,255,255,0.16);
-    }
-
-    img{
-      width:180px;
-      max-width:100%;
-      background:#fff;
-      padding:10px;
-      border-radius:8px;
-    }
-
-    .actions{
-      margin-top:12px;
-      display:flex;
-      gap:10px;
-    }
-
-    a{
-      flex:1;
-      text-align:center;
-      padding:10px 12px;
-      border-radius:10px;
-      text-decoration:none;
-      border:1px solid rgba(255,255,255,0.14);
-      color:#fff;
-      font-size:12px;
-      transition:0.15s;
-    }
-
-    a:hover{
-      background:rgba(255,255,255,0.06);
-    }
-
-    .hint{
-      margin-top:10px;
-      font-size:11px;
-      opacity:0.5;
-      line-height:1.4;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="wrap">
-    <div class="title">QR CODE GENERATOR</div>
-    <div class="sub">Enter any text or URL. Generate and download the QR instantly.</div>
-
-    <div class="inputRow">
-      <input id="textInput" placeholder="https://example.com" />
-      <button onclick="generateQR()">Generate</button>
-    </div>
-
-    <div class="qrbox" id="qrBox">
-      <div class="qrhead">
-        <span>Output</span>
-        <span class="pill">PNG</span>
-      </div>
-
-      <div class="qrimgWrap">
-        <img id="qrImg" src="" alt="QR Code" />
-      </div>
-
-      <div class="actions">
-        <a id="downloadBtn" href="#" download="qrcode.png">Download</a>
-        <a href="#" onclick="resetQR(); return false;">Clear</a>
-      </div>
-
-      <div class="hint">
-        Tip: Short links generate cleaner QR codes.
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const BACKEND_URL = "https://qr-code-generator-j1og.onrender.com";
-
-    async function generateQR() {
-      const text = document.getElementById("textInput").value.trim();
-
-      if (!text) {
-        alert("Please enter text or a URL.");
-        return;
-      }
-
-      try {
-        const res = await fetch(BACKEND_URL + "/api/generate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text })
-        });
-
-        if (!res.ok) throw new Error("QR generation failed");
-
-        const blob = await res.blob();
-        const imgUrl = URL.createObjectURL(blob);
-
-        document.getElementById("qrImg").src = imgUrl;
-        document.getElementById("downloadBtn").href = imgUrl;
-        document.getElementById("qrBox").style.display = "block";
-      } catch (e) {
-        alert("Backend not reachable.");
-      }
-    }
-
-    function resetQR(){
-      document.getElementById("qrBox").style.display = "none";
-      document.getElementById("qrImg").src = "";
-      document.getElementById("downloadBtn").href = "#";
-      document.getElementById("textInput").value = "";
-    }
-  </script>
-</body>
-</html>
-
-    a:hover{
-      background:rgba(255,255,255,0.06);
-    }
-  </style>
-</head>
-
-<body>
-  <div class="card">
-    <h1>QR Generator</h1>
-    <p>Enter any text or URL to generate a QR code.</p>
-
-    <input id="textInput" placeholder="Enter text or URL..." />
-    <button onclick="generateQR()">Generate</button>
-
-    <div class="qrbox" id="qrBox">
-      <img id="qrImg" src="" alt="QR Code" />
-      <br />
-      <a id="downloadBtn" href="#" download="qrcode.png">Download</a>
-    </div>
-  </div>
-
-  <script>
-    const BACKEND_URL = "https://qr-code-generator-j1og.onrender.com";
-
-    async function generateQR() {
-      const text = document.getElementById("textInput").value.trim();
-
-      if (!text) {
-        alert("Please enter text or a URL.");
-        return;
-      }
-
-      try {
-        const res = await fetch(BACKEND_URL + "/api/generate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text })
-        });
-
-        if (!res.ok) throw new Error("QR generation failed");
-
-        const blob = await res.blob();
-        const imgUrl = URL.createObjectURL(blob);
-
-        document.getElementById("qrImg").src = imgUrl;
-        document.getElementById("downloadBtn").href = imgUrl;
-        document.getElementById("qrBox").style.display = "block";
-      } catch (e) {
-        alert("Backend not reachable.");
-      }
-    }
-  </script>
-</body>
-</html>
-
-  <script>
-    // Change this if your backend is deployed (Render/Replit)
-    const BACKEND_URL = "https://qr-code-generator-j1og.onrender.com";
-
-    async function generateQR() {
-      const text = document.getElementById("textInput").value.trim();
-      if (!text) {
-        alert("Enter text or URL bro 😄");
-        return;
-      }
-
-      try {
-        const res = await fetch(BACKEND_URL + "/api/generate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text })
-        });
-
-        if (!res.ok) throw new Error("QR generation failed");
-
-        const blob = await res.blob();
-        const imgUrl = URL.createObjectURL(blob);
-
-        document.getElementById("qrImg").src = imgUrl;
-        document.getElementById("downloadBtn").href = imgUrl;
-        document.getElementById("qrBox").style.display = "block";
-      } catch (e) {
-        alert("Backend not reachable ");
-      }
-    }
+    });
   </script>
 </body>
 </html>
