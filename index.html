@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QR Gen HD</title>
+  <title>QR_Terminal_HD</title>
   
   <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
 
@@ -33,34 +33,34 @@
       max-width: 340px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 18px;
     }
 
     /* --- TYPOGRAPHY --- */
     h1 {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: 700;
+      letter-spacing: -1px;
       margin-bottom: 5px;
-      letter-spacing: -0.5px;
     }
     
-    /* The blinking cursor animation */
+    /* Blinking Cursor */
     h1::after {
       content: '_';
       animation: blink 1s infinite;
-      margin-left: 2px;
     }
 
     p {
       color: #666; 
-      font-size: 0.85rem;
+      font-size: 0.8rem;
     }
 
     label {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: #888;
-      margin-bottom: 8px;
+      margin-bottom: 5px;
       display: block;
+      text-transform: uppercase;
     }
 
     /* --- INPUTS --- */
@@ -69,10 +69,10 @@
       border: 1px solid #333;
       color: #fff;
       font-size: 0.9rem;
-      padding: 14px;
+      padding: 12px;
       width: 100%;
       outline: none;
-      border-radius: 6px;
+      border-radius: 2px; /* Square/sharp corners for terminal feel */
     }
 
     input:focus, select:focus {
@@ -85,8 +85,8 @@
       background: #fff;
       color: #000;
       border: 1px solid #fff;
-      padding: 14px;
-      border-radius: 6px;
+      padding: 12px;
+      border-radius: 2px;
       font-size: 0.9rem;
       font-weight: 700;
       cursor: pointer;
@@ -95,19 +95,19 @@
     }
 
     button:hover {
-      background: #ddd;
-      border-color: #ddd;
+      background: #ccc;
+      border-color: #ccc;
     }
 
     button:active {
       transform: translateY(2px);
     }
 
+    /* Secondary outline button */
     .btn-outline {
       background: transparent;
       color: #fff;
       border: 1px solid #333;
-      font-weight: 400;
     }
     
     .btn-outline:hover {
@@ -121,13 +121,13 @@
       flex-direction: column;
       gap: 15px;
       margin-top: 10px;
-      border-top: 1px solid #222;
-      padding-top: 25px;
+      border-top: 1px dashed #333;
+      padding-top: 20px;
     }
 
     /* FIXED SIZE CONTAINER */
     #canvas-container {
-      width: 220px;     /* Visually kept at medium size */
+      width: 220px;     
       height: 220px;
       margin: 0 auto;
       border: 1px solid #222;
@@ -138,7 +138,7 @@
       overflow: hidden;
     }
 
-    /* Force High-Res Canvas to fit container */
+    /* Force the High-Res Canvas to fit visually */
     #canvas-container canvas {
       width: 220px !important;
       height: 220px !important;
@@ -159,17 +159,17 @@
 
   <div class="container">
     <div>
-      <h1>QR Generator HD</h1>
-      <p>High resolution rendering enabled.</p>
+      <h1>QR_Generator_HD</h1>
+      <p>// High_Res rendering enabled.</p>
     </div>
 
     <div>
-      <label>Target URL or Text</label>
-      <input type="text" id="textInput" placeholder="Enter link..." autocomplete="off">
+      <label>Target URL / Text</label>
+      <input type="text" id="textInput" placeholder="https://..." autocomplete="off">
     </div>
 
     <div>
-      <label>Pattern Style</label>
+      <label>Pattern Type</label>
       <select id="styleSelect">
         <option value="square">Normal (Square)</option>
         <option value="dots">Dotted (Circles)</option>
@@ -177,14 +177,14 @@
       </select>
     </div>
     
-    <button onclick="generateQR()">Generate QR Code</button>
+    <button onclick="generateQR()">> EXECUTE_GENERATION</button>
 
     <div id="qr-section">
       <div id="canvas-container"></div>
       
       <div class="actions">
-        <button class="btn-outline" onclick="downloadQR()">Download PNG</button>
-        <button class="btn-outline" onclick="resetApp()">Reset</button>
+        <button class="btn-outline" onclick="downloadQR()">[ SAVE_PNG ]</button>
+        <button class="btn-outline" onclick="resetApp()">[ RESET ]</button>
       </div>
     </div>
   </div>
@@ -216,6 +216,10 @@
         data: text,
         margin: 0,
         qrOptions: {
+          // --- FIX IS HERE ---
+          // typeNumber: 10 forces the QR to be a dense grid (Version 10)
+          // even if you only type "hi".
+          typeNumber: 10, 
           errorCorrectionLevel: "Q"
         },
         dotsOptions: {
@@ -241,7 +245,7 @@
 
     function downloadQR() {
       if(qrCode) {
-        qrCode.download({ name: "qr-code", extension: "png" });
+        qrCode.download({ name: "qr_code_hd", extension: "png" });
       }
     }
 
