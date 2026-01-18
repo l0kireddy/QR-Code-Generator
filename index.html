@@ -10,7 +10,8 @@
       margin:0;
       padding:0;
       box-sizing:border-box;
-      font-family: Arial, sans-serif;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+                   "Liberation Mono", "Courier New", monospace;
     }
 
     body{
@@ -23,61 +24,64 @@
       padding:20px;
     }
 
-    .card{
+    .wrap{
       width:100%;
-      max-width:420px;
-      padding:22px;
-      border-radius:14px;
-      background:rgba(255,255,255,0.03);
-      border:1px solid rgba(255,255,255,0.12);
+      max-width:480px;
     }
 
-    h1{
-      font-size:20px;
+    .title{
+      font-size:14px;
       font-weight:600;
+      letter-spacing:0.6px;
       margin-bottom:6px;
-      letter-spacing:0.5px;
     }
 
-    p{
-      font-size:13px;
-      opacity:0.7;
+    .sub{
+      font-size:12px;
+      opacity:0.6;
       margin-bottom:16px;
+      line-height:1.4;
+    }
+
+    .inputRow{
+      display:flex;
+      gap:10px;
+      align-items:center;
     }
 
     input{
-      width:100%;
-      padding:12px 14px;
+      flex:1;
+      padding:12px 12px;
       border-radius:10px;
-      border:1px solid rgba(255,255,255,0.15);
+      border:1px solid rgba(255,255,255,0.14);
       outline:none;
       background:transparent;
       color:#fff;
-      margin-bottom:12px;
+      font-size:12px;
     }
 
     input::placeholder{
-      color: rgba(255,255,255,0.45);
+      color: rgba(255,255,255,0.35);
     }
 
     button{
-      width:100%;
       padding:12px 14px;
       border-radius:10px;
-      border:none;
+      border:1px solid rgba(255,255,255,0.14);
       cursor:pointer;
-      font-weight:600;
-      background:#fff;
-      color:#000;
+      background:transparent;
+      color:#fff;
+      font-size:12px;
       transition:0.15s;
+      white-space:nowrap;
     }
 
     button:hover{
-      opacity:0.9;
+      background:rgba(255,255,255,0.06);
     }
 
     button:active{
-      transform: scale(0.99);
+      transform:scale(0.99);
     }
 
     .qrbox{
@@ -86,28 +90,144 @@
       border-radius:12px;
       border:1px solid rgba(255,255,255,0.12);
       display:none;
-      text-align:center;
+    }
+
+    .qrhead{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:12px;
+      font-size:12px;
+      opacity:0.75;
+    }
+
+    .pill{
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.14);
+      opacity:0.8;
+    }
+
+    .qrimgWrap{
+      display:flex;
+      justify-content:center;
+      padding:12px;
+      border-radius:10px;
+      background:rgba(255,255,255,0.03);
+      border:1px dashed rgba(255,255,255,0.16);
     }
 
     img{
-      width:210px;
+      width:180px;
       max-width:100%;
       background:#fff;
       padding:10px;
-      border-radius:10px;
-      margin-bottom:12px;
+      border-radius:8px;
+    }
+
+    .actions{
+      margin-top:12px;
+      display:flex;
+      gap:10px;
     }
 
     a{
-      display:inline-block;
-      padding:10px 14px;
+      flex:1;
+      text-align:center;
+      padding:10px 12px;
       border-radius:10px;
       text-decoration:none;
-      border:1px solid rgba(255,255,255,0.15);
+      border:1px solid rgba(255,255,255,0.14);
       color:#fff;
-      font-size:13px;
+      font-size:12px;
       transition:0.15s;
     }
+
+    a:hover{
+      background:rgba(255,255,255,0.06);
+    }
+
+    .hint{
+      margin-top:10px;
+      font-size:11px;
+      opacity:0.5;
+      line-height:1.4;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="title">QR CODE GENERATOR</div>
+    <div class="sub">Enter any text or URL. Generate and download the QR instantly.</div>
+
+    <div class="inputRow">
+      <input id="textInput" placeholder="https://example.com" />
+      <button onclick="generateQR()">Generate</button>
+    </div>
+
+    <div class="qrbox" id="qrBox">
+      <div class="qrhead">
+        <span>Output</span>
+        <span class="pill">PNG</span>
+      </div>
+
+      <div class="qrimgWrap">
+        <img id="qrImg" src="" alt="QR Code" />
+      </div>
+
+      <div class="actions">
+        <a id="downloadBtn" href="#" download="qrcode.png">Download</a>
+        <a href="#" onclick="resetQR(); return false;">Clear</a>
+      </div>
+
+      <div class="hint">
+        Tip: Short links generate cleaner QR codes.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = "https://qr-code-generator-j1og.onrender.com";
+
+    async function generateQR() {
+      const text = document.getElementById("textInput").value.trim();
+
+      if (!text) {
+        alert("Please enter text or a URL.");
+        return;
+      }
+
+      try {
+        const res = await fetch(BACKEND_URL + "/api/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text })
+        });
+
+        if (!res.ok) throw new Error("QR generation failed");
+
+        const blob = await res.blob();
+        const imgUrl = URL.createObjectURL(blob);
+
+        document.getElementById("qrImg").src = imgUrl;
+        document.getElementById("downloadBtn").href = imgUrl;
+        document.getElementById("qrBox").style.display = "block";
+      } catch (e) {
+        alert("Backend not reachable.");
+      }
+    }
+
+    function resetQR(){
+      document.getElementById("qrBox").style.display = "none";
+      document.getElementById("qrImg").src = "";
+      document.getElementById("downloadBtn").href = "#";
+      document.getElementById("textInput").value = "";
+    }
+  </script>
+</body>
+</html>
 
     a:hover{
       background:rgba(255,255,255,0.06);
