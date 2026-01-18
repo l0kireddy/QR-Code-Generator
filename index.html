@@ -12,102 +12,157 @@
       box-sizing:border-box;
       font-family: Arial, sans-serif;
     }
+
     body{
       height:100vh;
       display:flex;
       justify-content:center;
       align-items:center;
-      background: radial-gradient(circle at top left, #00c6ff, #0072ff);
-      padding: 20px;
+      background:#000;
+      color:#fff;
+      padding:20px;
     }
-    .glass{
-      width: 100%;
-      max-width: 380px;
-      padding: 22px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.18);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.25);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-      color: white;
+
+    .card{
+      width:100%;
+      max-width:420px;
+      padding:22px;
+      border-radius:14px;
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.12);
+    }
+
+    h1{
+      font-size:20px;
+      font-weight:600;
+      margin-bottom:6px;
+      letter-spacing:0.5px;
+    }
+
+    p{
+      font-size:13px;
+      opacity:0.7;
+      margin-bottom:16px;
+    }
+
+    input{
+      width:100%;
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.15);
+      outline:none;
+      background:transparent;
+      color:#fff;
+      margin-bottom:12px;
+    }
+
+    input::placeholder{
+      color: rgba(255,255,255,0.45);
+    }
+
+    button{
+      width:100%;
+      padding:12px 14px;
+      border-radius:10px;
+      border:none;
+      cursor:pointer;
+      font-weight:600;
+      background:#fff;
+      color:#000;
+      transition:0.15s;
+    }
+
+    button:hover{
+      opacity:0.9;
+    }
+
+    button:active{
+      transform: scale(0.99);
+    }
+
+    .qrbox{
+      margin-top:16px;
+      padding:14px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.12);
+      display:none;
       text-align:center;
     }
-    h1{
-      font-size: 22px;
-      margin-bottom: 6px;
-    }
-    p{
-      font-size: 13px;
-      opacity: 0.85;
-      margin-bottom: 14px;
-    }
-    input{
-      width: 100%;
-      padding: 12px;
-      border-radius: 12px;
-      border: none;
-      outline: none;
-      background: rgba(255,255,255,0.22);
-      color: white;
-      margin-bottom: 10px;
-    }
-    input::placeholder{
-      color: rgba(255,255,255,0.7);
-    }
-    button{
-      width: 100%;
-      padding: 12px;
-      border-radius: 12px;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-      background: white;
-      color: #0072ff;
-      transition: 0.2s;
-    }
-    button:active{
-      transform: scale(0.98);
-    }
-    .qrbox{
-      margin-top: 14px;
-      padding: 14px;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.18);
-      display:none;
-    }
+
     img{
-      width: 210px;
-      background: white;
-      padding: 10px;
-      border-radius: 12px;
-      margin-bottom: 10px;
+      width:210px;
+      max-width:100%;
+      background:#fff;
+      padding:10px;
+      border-radius:10px;
+      margin-bottom:12px;
     }
+
     a{
       display:inline-block;
-      padding: 10px 14px;
-      background: white;
-      border-radius: 12px;
+      padding:10px 14px;
+      border-radius:10px;
       text-decoration:none;
-      font-weight:bold;
-      color:#0072ff;
+      border:1px solid rgba(255,255,255,0.15);
+      color:#fff;
+      font-size:13px;
+      transition:0.15s;
+    }
+
+    a:hover{
+      background:rgba(255,255,255,0.06);
     }
   </style>
 </head>
 
 <body>
-  <div class="glass">
-    <h1> QR Generator</h1>
-    <p>Simple HTML + Flask backend </p>
+  <div class="card">
+    <h1>QR Generator</h1>
+    <p>Enter any text or URL to generate a QR code.</p>
 
-    <input id="textInput" placeholder="Enter Text / URL..." />
-    <button onclick="generateQR()">Generate QR </button>
+    <input id="textInput" placeholder="Enter text or URL..." />
+    <button onclick="generateQR()">Generate</button>
 
     <div class="qrbox" id="qrBox">
       <img id="qrImg" src="" alt="QR Code" />
       <br />
-      <a id="downloadBtn" href="#" download="qrcode.png">Download </a>
+      <a id="downloadBtn" href="#" download="qrcode.png">Download</a>
     </div>
   </div>
+
+  <script>
+    const BACKEND_URL = "https://qr-code-generator-j1og.onrender.com";
+
+    async function generateQR() {
+      const text = document.getElementById("textInput").value.trim();
+
+      if (!text) {
+        alert("Please enter text or a URL.");
+        return;
+      }
+
+      try {
+        const res = await fetch(BACKEND_URL + "/api/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text })
+        });
+
+        if (!res.ok) throw new Error("QR generation failed");
+
+        const blob = await res.blob();
+        const imgUrl = URL.createObjectURL(blob);
+
+        document.getElementById("qrImg").src = imgUrl;
+        document.getElementById("downloadBtn").href = imgUrl;
+        document.getElementById("qrBox").style.display = "block";
+      } catch (e) {
+        alert("Backend not reachable.");
+      }
+    }
+  </script>
+</body>
+</html>
 
   <script>
     // Change this if your backend is deployed (Render/Replit)
