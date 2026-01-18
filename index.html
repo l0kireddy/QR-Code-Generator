@@ -3,261 +3,395 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QR_Terminal_HD</title>
+  <title>QR_Terminal_Master_v6</title>
   
   <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
 
   <style>
     /* --- RESET & MONOSPACE FONT --- */
     * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+      margin: 0; padding: 0; box-sizing: border-box;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     }
 
     body {
-      background-color: #000;
-      color: #fff;
+      background-color: #050505;
+      background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 100%);
+      color: #e0e0e0;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
       padding: 20px;
     }
 
-    /* --- CONTAINER --- */
-    .container {
-      width: 100%;
-      max-width: 340px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
+    /* --- GLASS TERMINAL CONTAINER --- */
+    .glass-terminal {
+      width: 100%; max-width: 440px;
+      display: flex; flex-direction: column; gap: 20px;
+      background: rgba(20, 20, 20, 0.75); 
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      padding: 30px; border-radius: 0px; 
     }
 
-    /* --- TYPOGRAPHY --- */
     h1 {
-      font-size: 1.4rem;
-      font-weight: 700;
-      letter-spacing: -1px;
-      margin-bottom: 5px;
+      font-size: 1.2rem; font-weight: 700; color: #fff;
+      text-transform: uppercase; border-bottom: 1px solid #333;
+      padding-bottom: 10px; margin-bottom: 5px;
     }
-    
-    /* Blinking Cursor */
-    h1::after {
-      content: '_';
-      animation: blink 1s infinite;
-    }
+    h1::after { content: '_'; animation: blink 1s infinite; }
 
-    p {
-      color: #666; 
-      font-size: 0.8rem;
+    /* --- MODE TABS --- */
+    .mode-switch { display: flex; gap: 0; border: 1px solid #333; margin-bottom: 10px; }
+    .mode-btn {
+      flex: 1; background: rgba(0,0,0,0.5); color: #666;
+      padding: 12px; border: none; cursor: pointer;
+      font-weight: bold; text-transform: uppercase; transition: 0.2s;
     }
-
-    label {
-      font-size: 0.7rem;
-      color: #888;
-      margin-bottom: 5px;
-      display: block;
-      text-transform: uppercase;
-    }
+    .mode-btn.active { background: #e0e0e0; color: #000; }
 
     /* --- INPUTS --- */
-    input, select {
-      background: #111; 
-      border: 1px solid #333;
-      color: #fff;
-      font-size: 0.9rem;
-      padding: 12px;
-      width: 100%;
-      outline: none;
-      border-radius: 2px; /* Square/sharp corners for terminal feel */
+    label {
+      font-size: 0.75rem; color: #888; margin-bottom: 8px;
+      display: block; text-transform: uppercase; letter-spacing: 1px;
+    }
+    input[type="text"], select, input[type="file"] {
+      background: rgba(0, 0, 0, 0.5); border: 1px solid #333;
+      color: #fff; font-size: 0.9rem; padding: 14px;
+      width: 100%; outline: none; border-radius: 0px; 
+    }
+    input:focus, select:focus { border-color: #fff; background: #000; }
+
+    /* --- TOGGLES --- */
+    .toggle-row {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.05); padding: 10px;
+      border: 1px solid #333; margin-bottom: 10px; cursor: pointer; transition: 0.2s;
+    }
+    .toggle-label { font-size: 0.8rem; font-weight: bold; color: #ccc; }
+    .toggle-status {
+      font-size: 0.7rem; background: #000; padding: 4px 8px;
+      border: 1px solid #333; color: #555;
+    }
+    .toggle-row:hover { border-color: #666; }
+    .toggle-row.active { border-color: #00ff41; background: rgba(0, 255, 65, 0.05); }
+    .toggle-row.active .toggle-status { background: #00ff41; color: #000; border-color: #00ff41; }
+
+    /* --- SUB-OPTIONS --- */
+    .sub-options {
+      display: none; flex-direction: column; gap: 15px; padding: 15px;
+      border-left: 2px solid #333; background: rgba(0,0,0,0.2); margin-bottom: 15px;
     }
 
-    input:focus, select:focus {
-      border-color: #fff;
-      background: #000;
+    /* --- GRADIENT TOOLS --- */
+    .gradient-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+    .btn-add-color {
+        background: #333; color: #fff; border: none; padding: 5px 10px;
+        font-size: 0.7rem; cursor: pointer;
+    }
+    .btn-add-color:hover { background: #00ff41; color: #000; }
+    .color-list { display: flex; flex-direction: column; gap: 8px; }
+    .color-row { display: flex; gap: 10px; align-items: center; }
+    input[type="color"] {
+      -webkit-appearance: none; border: 1px solid #333;
+      width: 100%; height: 35px; background: none; padding: 0; cursor: pointer;
     }
 
     /* --- BUTTONS --- */
-    button {
-      background: #fff;
-      color: #000;
-      border: 1px solid #fff;
-      padding: 12px;
-      border-radius: 2px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      cursor: pointer;
-      width: 100%;
-      transition: 0.1s;
+    button.action-btn {
+      background: #eee; color: #000; border: none;
+      padding: 16px; border-radius: 0px; font-weight: 900;
+      text-transform: uppercase; cursor: pointer; letter-spacing: 1px;
+      width: 100%; margin-top: 10px;
     }
+    button.action-btn:hover { background: #fff; }
 
-    button:hover {
-      background: #ccc;
-      border-color: #ccc;
-    }
-
-    button:active {
-      transform: translateY(2px);
-    }
-
-    /* Secondary outline button */
     .btn-outline {
-      background: transparent;
-      color: #fff;
-      border: 1px solid #333;
+      background: transparent; color: #fff; border: 1px solid #444;
+      padding: 10px; cursor: pointer;
     }
-    
-    .btn-outline:hover {
-      border-color: #fff;
-      background: transparent;
-    }
+    .btn-small { width: auto; padding: 0 15px; height: 35px; }
 
-    /* --- QR OUTPUT --- */
+    /* --- OUTPUT --- */
+    #custom-panel { display: none; flex-direction: column; gap: 5px; margin-top: 10px; }
     #qr-section {
-      display: none; 
-      flex-direction: column;
-      gap: 15px;
-      margin-top: 10px;
-      border-top: 1px dashed #333;
-      padding-top: 20px;
+      display: none; flex-direction: column; gap: 20px;
+      margin-top: 10px; border-top: 1px dashed #333;
+      padding-top: 25px; align-items: center;
     }
+    #canvas-container { border: 1px solid #333; padding: 10px; background: #000; }
+    #canvas-container canvas { width: 240px !important; height: 240px !important; }
+    .actions { display: flex; gap: 10px; width: 100%; }
 
-    /* FIXED SIZE CONTAINER */
-    #canvas-container {
-      width: 220px;     
-      height: 220px;
-      margin: 0 auto;
-      border: 1px solid #222;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: #000;
-      overflow: hidden;
-    }
-
-    /* Force the High-Res Canvas to fit visually */
-    #canvas-container canvas {
-      width: 220px !important;
-      height: 220px !important;
-    }
-
-    .actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
   </style>
 </head>
 <body>
 
-  <div class="container">
+  <div class="glass-terminal">
+    <h1>Master_Generator_v6</h1>
+
     <div>
-      <h1>QR_Generator_HD</h1>
-      <p>// High_Res rendering enabled.</p>
+      <label>Operation_Mode</label>
+      <div class="mode-switch">
+        <button class="mode-btn active" onclick="setMode('standard')" id="btn-standard">Standard</button>
+        <button class="mode-btn" onclick="setMode('custom')" id="btn-custom">Custom</button>
+      </div>
     </div>
 
     <div>
-      <label>Target URL / Text</label>
+      <label>Input_Data</label>
       <input type="text" id="textInput" placeholder="https://..." autocomplete="off">
     </div>
 
     <div>
-      <label>Pattern Type</label>
+      <label>Base_Matrix</label>
       <select id="styleSelect">
         <option value="square">Normal (Square)</option>
         <option value="dots">Dotted (Circles)</option>
         <option value="extra-rounded">Fluid (Rounded)</option>
       </select>
     </div>
+
+    <div id="custom-panel">
+      
+      <div class="toggle-row" onclick="toggleFeature('gradient')">
+        <span class="toggle-label">>> MODULE: COLOR_ENGINE</span>
+        <span class="toggle-status" id="status-gradient">[ OFF ]</span>
+      </div>
+      <div class="sub-options" id="opt-gradient">
+        <div>
+           <label>Fade_Type</label>
+           <select id="gradientType">
+              <option value="linear">Linear_Fade (45°)</option>
+              <option value="radial">Radial_Bloom (Center)</option>
+            </select>
+        </div>
+        <div>
+            <div class="gradient-header">
+                <label style="margin:0">Gradient_Stops</label>
+                <button class="btn-add-color" onclick="addColor()">[+] ADD</button>
+            </div>
+            <div class="color-list" id="colorList">
+              <div class="color-row"><input type="color" value="#00ff41" class="color-stop"><button class="btn-outline btn-small" onclick="removeColor(this)">X</button></div>
+              <div class="color-row"><input type="color" value="#008f11" class="color-stop"><button class="btn-outline btn-small" onclick="removeColor(this)">X</button></div>
+            </div>
+        </div>
+      </div>
+
+      <div class="toggle-row" onclick="toggleFeature('corners')">
+        <span class="toggle-label">>> MODULE: CORNER_SHAPES</span>
+        <span class="toggle-status" id="status-corners">[ OFF ]</span>
+      </div>
+      <div class="sub-options" id="opt-corners">
+        <label>Corner_Square_Style</label>
+        <select id="cornerSquareStyle">
+          <option value="square">Square</option>
+          <option value="dot">Dot</option>
+          <option value="extra-rounded">Rounded</option>
+        </select>
+        <label style="margin-top:10px">Corner_Dot_Style</label>
+        <select id="cornerDotStyle">
+          <option value="square">Square</option>
+          <option value="dot">Dot</option>
+        </select>
+      </div>
+
+      <div class="toggle-row" onclick="toggleFeature('logo')">
+        <span class="toggle-label">>> MODULE: BRAND_IDENTITY (LOGO)</span>
+        <span class="toggle-status" id="status-logo">[ OFF ]</span>
+      </div>
+      <div class="sub-options" id="opt-logo">
+        <label>Upload_File (.PNG recommended)</label>
+        <input type="file" id="logoInput" accept="image/*">
+      </div>
+
+      <div class="toggle-row" onclick="toggleFeature('background')">
+        <span class="toggle-label">>> MODULE: BACKDROP_IMG</span>
+        <span class="toggle-status" id="status-background">[ OFF ]</span>
+      </div>
+      <div class="sub-options" id="opt-background">
+        <label>Upload_Backdrop</label>
+        <input type="file" id="bgInput" accept="image/*">
+      </div>
+
+    </div>
     
-    <button onclick="generateQR()">> EXECUTE_GENERATION</button>
+    <button class="action-btn" onclick="generateQR()">>> EXECUTE</button>
 
     <div id="qr-section">
       <div id="canvas-container"></div>
-      
       <div class="actions">
-        <button class="btn-outline" onclick="downloadQR()">[ SAVE_PNG ]</button>
-        <button class="btn-outline" onclick="resetApp()">[ RESET ]</button>
+        <button class="btn-outline" style="flex:1" onclick="downloadQR()">[ SAVE ]</button>
+        <button class="btn-outline" style="flex:1" onclick="resetApp()">[ FLUSH ]</button>
       </div>
     </div>
   </div>
 
   <script>
+    let currentMode = 'standard'; 
     let qrCode;
-    const qrContainer = document.getElementById("canvas-container");
-    const qrSection = document.getElementById("qr-section");
-    const textInput = document.getElementById("textInput");
-    const styleSelect = document.getElementById("styleSelect");
+    
+    // Feature Flags
+    let features = {
+      gradient: false,
+      corners: false,
+      logo: false,
+      background: false
+    };
 
-    function generateQR() {
-      const text = textInput.value.trim();
-      const style = styleSelect.value;
-
-      if (!text) {
-        textInput.style.borderColor = "red";
-        setTimeout(() => textInput.style.borderColor = "#333", 800);
-        return;
-      }
-
-      qrContainer.innerHTML = "";
-
-      // GENERATING AT HIGH RESOLUTION (1000px)
-      qrCode = new QRCodeStyling({
-        width: 1000,
-        height: 1000,
-        type: "canvas",
-        data: text,
-        margin: 0,
-        qrOptions: {
-          // --- FIX IS HERE ---
-          // typeNumber: 10 forces the QR to be a dense grid (Version 10)
-          // even if you only type "hi".
-          typeNumber: 10, 
-          errorCorrectionLevel: "Q"
-        },
-        dotsOptions: {
-          color: "#ffffff",
-          type: style 
-        },
-        backgroundOptions: {
-          color: "#000000",
-        },
-        cornersSquareOptions: {
-          color: "#ffffff",
-          type: style === 'dots' ? 'dot' : 'square'
-        },
-        cornersDotOptions: {
-          color: "#ffffff",
-          type: style === 'dots' ? 'dot' : 'square'
-        }
-      });
-
-      qrCode.append(qrContainer);
-      qrSection.style.display = "flex";
-    }
-
-    function downloadQR() {
-      if(qrCode) {
-        qrCode.download({ name: "qr_code_hd", extension: "png" });
+    // UI REFS
+    const customPanel = document.getElementById('custom-panel');
+    const btnStandard = document.getElementById('btn-standard');
+    const btnCustom = document.getElementById('btn-custom');
+    
+    // --- MODE SWITCH ---
+    function setMode(mode) {
+      currentMode = mode;
+      if (mode === 'standard') {
+        customPanel.style.display = 'none';
+        btnStandard.classList.add('active');
+        btnCustom.classList.remove('active');
+      } else {
+        customPanel.style.display = 'flex';
+        btnStandard.classList.remove('active');
+        btnCustom.classList.add('active');
       }
     }
 
-    function resetApp() {
-      textInput.value = "";
-      qrSection.style.display = "none";
-      qrContainer.innerHTML = "";
+    // --- TOGGLE LOGIC ---
+    function toggleFeature(feature) {
+      features[feature] = !features[feature];
+      const uiRow = document.querySelector(`.toggle-row[onclick="toggleFeature('${feature}')"]`);
+      const statusSpan = document.getElementById(`status-${feature}`);
+      const optionsDiv = document.getElementById(`opt-${feature}`);
+
+      if (features[feature]) {
+        uiRow.classList.add('active');
+        statusSpan.innerText = "[ ON ]";
+        optionsDiv.style.display = "flex";
+      } else {
+        uiRow.classList.remove('active');
+        statusSpan.innerText = "[ OFF ]";
+        optionsDiv.style.display = "none";
+      }
+    }
+
+    // --- HELPER: Gradient Config ---
+    function getGradientConfig() {
+      const inputs = document.querySelectorAll(".color-stop");
+      const colors = Array.from(inputs).map(i => i.value);
+      const stops = colors.map((c, i) => ({ offset: i/(colors.length-1||1), color: c }));
+      return {
+        type: document.getElementById("gradientType").value,
+        rotation: 45 * (Math.PI/180),
+        colorStops: stops
+      };
+    }
+
+    function addColor() {
+      const div = document.createElement("div");
+      div.className="color-row";
+      div.innerHTML=`<input type="color" value="#ffffff" class="color-stop"><button class="btn-outline btn-small" onclick="this.parentElement.remove()">X</button>`;
+      document.getElementById("colorList").appendChild(div);
     }
     
-    textInput.addEventListener("keypress", (e) => {
-      if(e.key === "Enter") generateQR();
-    });
+    function removeColor(btn) { 
+        if(document.querySelectorAll('.color-row').length > 1) btn.parentElement.remove(); 
+        else alert("Need at least 1 color.");
+    }
+
+    // --- GENERATE ---
+    async function generateQR() {
+      const text = document.getElementById("textInput").value.trim();
+      const baseStyle = document.getElementById("styleSelect").value;
+      const qrContainer = document.getElementById("canvas-container");
+
+      if (!text) return alert("NO INPUT DETECTED");
+      qrContainer.innerHTML = "";
+      
+      // 1. Base Config
+      let options = {
+        width: 1000, height: 1000, type: "canvas", data: text,
+        qrOptions: { typeNumber:0, errorCorrectionLevel:"Q" },
+        dotsOptions: { type: baseStyle, color: "#ffffff" },
+        backgroundOptions: { color: "#000000" },
+        cornersSquareOptions: { type: baseStyle==='dots'?'dot':'square', color: "#ffffff" },
+        cornersDotOptions: { type: baseStyle==='dots'?'dot':'square', color: "#ffffff" },
+        imageOptions: { crossOrigin: "anonymous", margin: 10, imageSize: 0.4 }
+      };
+
+      // 2. Custom Overrides
+      if (currentMode === 'custom') {
+        
+        // A. Gradient
+        if (features.gradient) {
+           const gradConf = getGradientConfig();
+           options.dotsOptions.gradient = gradConf;
+           options.cornersSquareOptions.color = gradConf.colorStops[0].color;
+           options.cornersDotOptions.color = gradConf.colorStops[0].color;
+        }
+
+        // B. Corners
+        if (features.corners) {
+          options.cornersSquareOptions.type = document.getElementById('cornerSquareStyle').value;
+          options.cornersDotOptions.type = document.getElementById('cornerDotStyle').value;
+        }
+
+        // C. Logo (Async)
+        if (features.logo) {
+            const logoFile = document.getElementById('logoInput').files[0];
+            if (logoFile) {
+                options.image = await new Promise(r => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => r(e.target.result);
+                    reader.readAsDataURL(logoFile);
+                });
+            }
+        }
+
+        // D. Background (Async)
+        if (features.background) {
+            const bgFile = document.getElementById('bgInput').files[0];
+            if (bgFile) {
+                const bgUrl = await new Promise(r => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => r(e.target.result);
+                    reader.readAsDataURL(bgFile);
+                });
+                // When using a background image, we usually want the background color transparent
+                options.backgroundOptions = { color: "transparent" };
+                // NOTE: qr-code-styling doesn't strictly support "backgroundImage" prop, 
+                // so we handle it by CSS on the container or canvas usually, 
+                // BUT this library supports it via `backgroundOptions` if updated, 
+                // or we rely on the library treating transparent BG correctly.
+                // *Hack:* We will apply it to the container div for preview.
+                qrContainer.style.backgroundImage = `url(${bgUrl})`;
+                qrContainer.style.backgroundSize = 'cover';
+            } else {
+                qrContainer.style.backgroundImage = 'none';
+            }
+        } else {
+            // Reset if feature is OFF
+            qrContainer.style.backgroundImage = 'none';
+        }
+      } else {
+          // Standard Mode Reset
+          qrContainer.style.backgroundImage = 'none';
+      }
+
+      // 3. Render
+      qrCode = new QRCodeStyling(options);
+      qrCode.append(qrContainer);
+      document.getElementById("qr-section").style.display = "flex";
+    }
+
+    function downloadQR() { if(qrCode) qrCode.download({name:"qr_master_v6", extension:"png"}); }
+    function resetApp() { 
+        document.getElementById("textInput").value=""; 
+        document.getElementById("qr-section").style.display="none"; 
+        document.getElementById("canvas-container").innerHTML=""; 
+    }
   </script>
 </body>
 </html>
