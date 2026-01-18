@@ -96,21 +96,21 @@
 
 <body>
   <div class="glass">
-    <h1>⚡ QR Generator</h1>
-    <p>Simple HTML + Flask backend ✅</p>
+    <h1> QR Generator</h1>
+    <p>Simple HTML + Flask backend </p>
 
     <input id="textInput" placeholder="Enter Text / URL..." />
-    <button onclick="generateQR()">Generate QR 🚀</button>
+    <button onclick="generateQR()">Generate QR </button>
 
     <div class="qrbox" id="qrBox">
       <img id="qrImg" src="" alt="QR Code" />
       <br />
-      <a id="downloadBtn" href="#" download="qrcode.png">Download ✅</a>
+      <a id="downloadBtn" href="#" download="qrcode.png">Download </a>
     </div>
   </div>
 
   <script>
-    // ✅ Change this if your backend is deployed (Render/Replit)
+    // Change this if your backend is deployed (Render/Replit)
     const BACKEND_URL = "https://qr-code-generator-j1og.onrender.com";
 
     async function generateQR() {
@@ -136,7 +136,7 @@
         document.getElementById("downloadBtn").href = imgUrl;
         document.getElementById("qrBox").style.display = "block";
       } catch (e) {
-        alert("Backend not reachable ❌");
+        alert("Backend not reachable ");
       }
     }
   </script>
