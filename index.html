@@ -3,25 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QR Generator</title>
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>QR Gen</title>
   
   <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
 
   <style>
-    /* --- RESET & TYPOGRAPHY --- */
+    /* --- RESET & MONOSPACE FONT --- */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Alliance Regular', 'Alliance', 'Inter', sans-serif;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     }
 
     body {
-      background-color: #000; /* Pure Black */
+      background-color: #000;
       color: #fff;
       min-height: 100vh;
       display: flex;
@@ -31,186 +27,156 @@
       padding: 20px;
     }
 
-    /* --- LAYOUT CONTAINER --- */
+    /* --- CONTAINER --- */
     .container {
       width: 100%;
-      max-width: 380px;
+      max-width: 340px; /* Kept narrow for a fixed feel */
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 18px;
     }
 
-    /* --- HEADINGS --- */
-    .header {
-      margin-bottom: 10px;
+    /* --- TYPOGRAPHY --- */
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 5px;
     }
     
-    h1 {
-      font-weight: 400; 
-      font-size: 2rem;
-      letter-spacing: -0.5px;
-      color: #fff;
+    h1::after {
+      content: '_';
+      animation: blink 1s infinite;
     }
 
     p {
       color: #666; 
-      font-size: 0.9rem;
-      margin-top: 5px;
+      font-size: 0.8rem;
     }
 
-    /* --- INPUTS & SELECTS --- */
     label {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: #888;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
       display: block;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
-    .input-wrapper {
-      display: flex;
-      flex-direction: column;
-    }
-
+    /* --- INPUTS --- */
     input, select {
       background: #111; 
-      border: 1px solid #222;
+      border: 1px solid #333;
       color: #fff;
-      font-size: 0.95rem;
-      padding: 14px 16px;
+      font-size: 0.9rem;
+      padding: 12px;
       width: 100%;
       outline: none;
-      border-radius: 10px;
-      appearance: none; /* Removes default browser arrow */
-      transition: 0.2s ease;
+      border-radius: 4px; /* Sharper corners for mono look */
     }
 
     input:focus, select:focus {
-      border-color: #555;
-      background: #080808;
-    }
-
-    /* Custom Arrow for Select */
-    .select-wrapper {
-      position: relative;
-    }
-    
-    .select-wrapper::after {
-      content: '↓';
-      font-size: 0.8rem;
-      color: #666;
-      position: absolute;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      pointer-events: none;
+      border-color: #fff;
+      background: #000;
     }
 
     /* --- BUTTONS --- */
-    .btn-main {
+    button {
       background: #fff;
       color: #000;
-      border: none;
-      padding: 16px;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 600;
+      border: 1px solid #fff;
+      padding: 12px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: 700;
       cursor: pointer;
       width: 100%;
-      margin-top: 10px;
-      transition: opacity 0.2s;
+      transition: 0.1s;
     }
 
-    .btn-main:hover {
-      opacity: 0.9;
+    button:hover {
+      background: #ccc;
+      border-color: #ccc;
     }
 
-    /* --- QR DISPLAY AREA --- */
+    button:active {
+      transform: translateY(2px);
+    }
+
+    /* Secondary outline button */
+    .btn-outline {
+      background: transparent;
+      color: #fff;
+      border: 1px solid #333;
+    }
+    
+    .btn-outline:hover {
+      border-color: #fff;
+      background: transparent;
+    }
+
+    /* --- QR OUTPUT --- */
     #qr-section {
-      display: none; /* Hidden initially */
-      background: #111;
-      border: 1px solid #222;
-      border-radius: 16px;
-      padding: 20px;
+      display: none; /* Hidden by default */
       flex-direction: column;
-      align-items: center;
       gap: 15px;
-      animation: fadeUp 0.5s ease;
       margin-top: 10px;
+      border-top: 1px dashed #333;
+      padding-top: 20px;
     }
 
-    /* The div where the canvas renders */
+    /* FIXED SIZE CONTAINER */
     #canvas-container {
-      border-radius: 8px;
-      overflow: hidden;
-      /* Ensures the black QR blends if we use transparent bg, 
-         but we are using white dots on black bg. */
+      width: 220px;     /* FIXED WIDTH */
+      height: 220px;    /* FIXED HEIGHT */
+      margin: 0 auto;   /* Center it */
+      border: 1px solid #222;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
     }
 
-    /* --- ACTION BUTTONS --- */
     .actions {
       display: flex;
       gap: 10px;
-      width: 100%;
     }
 
-    .btn-secondary {
-      flex: 1;
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      text-align: center;
-      cursor: pointer;
-      text-decoration: none;
-      border: 1px solid #333;
-      background: transparent;
-      color: #fff;
-      transition: 0.2s;
-    }
-
-    .btn-secondary:hover {
-      background: #222;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <div class="header">
-      <h1>QR Creator.</h1>
-      <p>Select a style and generate.</p>
+    <div>
+      <h1>QR_Generator</h1>
+      <p>// Enter details below to execute.</p>
     </div>
 
-    <div class="input-wrapper">
-      <label>Content</label>
-      <input type="text" id="textInput" placeholder="Enter website or text..." autocomplete="off">
+    <div>
+      <label>Target URL / Text</label>
+      <input type="text" id="textInput" placeholder="https://..." autocomplete="off">
     </div>
 
-    <div class="input-wrapper">
-      <label>Style</label>
-      <div class="select-wrapper">
-        <select id="styleSelect">
-          <option value="square">Normal (Square)</option>
-          <option value="dots">Dotted (Circles)</option>
-          <option value="extra-rounded">Fluid (Rounded)</option>
-        </select>
-      </div>
+    <div>
+      <label>Pattern Type</label>
+      <select id="styleSelect">
+        <option value="square">Normal (Square)</option>
+        <option value="dots">Dotted (Circles)</option>
+        <option value="extra-rounded">Fluid (Rounded)</option>
+      </select>
     </div>
     
-    <button class="btn-main" onclick="generateQR()">Generate Code</button>
+    <button onclick="generateQR()">> GENERATE_QR</button>
 
     <div id="qr-section">
       <div id="canvas-container"></div>
       
       <div class="actions">
-        <button class="btn-secondary" onclick="downloadQR()">Download</button>
-        <button class="btn-secondary" onclick="resetApp()">Reset</button>
+        <button class="btn-outline" onclick="downloadQR()">[DOWNLOAD]</button>
+        <button class="btn-outline" onclick="resetApp()">[RESET]</button>
       </div>
     </div>
   </div>
@@ -224,42 +190,38 @@
 
     function generateQR() {
       const text = textInput.value.trim();
-      const style = styleSelect.value; // 'square', 'dots', or 'extra-rounded'
+      const style = styleSelect.value;
 
       if (!text) {
-        textInput.style.borderColor = "#fff";
-        setTimeout(() => textInput.style.borderColor = "#222", 500);
+        textInput.style.borderColor = "red";
+        setTimeout(() => textInput.style.borderColor = "#333", 800);
         return;
       }
 
-      // Clear previous container
+      // 1. Clear previous
       qrContainer.innerHTML = "";
 
-      // Initialize the advanced QR Library
+      // 2. Configure QR
+      // Fixed size: 220x220
       qrCode = new QRCodeStyling({
-        width: 240,
-        height: 240,
-        type: "canvas", // Uses Canvas for better rendering
+        width: 220,
+        height: 220,
+        type: "canvas",
         data: text,
         margin: 0,
         qrOptions: {
-          typeNumber: 0,
-          mode: "Byte",
-          errorCorrectionLevel: "Q" // High error correction
+          errorCorrectionLevel: "Q"
         },
-        // DOT OPTIONS (The main pattern)
         dotsOptions: {
-          color: "#ffffff", // White Dots
-          type: style       // Selected Style
+          color: "#ffffff",
+          type: style 
         },
-        // BACKGROUND OPTIONS
         backgroundOptions: {
-          color: "#000000", // Black Background
+          color: "#000000",
         },
-        // CORNER OPTIONS (The 3 big eyes)
         cornersSquareOptions: {
           color: "#ffffff",
-          type: style === 'dots' ? 'dot' : 'square' // Match corners to style
+          type: style === 'dots' ? 'dot' : 'square'
         },
         cornersDotOptions: {
           color: "#ffffff",
@@ -267,16 +229,14 @@
         }
       });
 
-      // Append to div
+      // 3. Render
       qrCode.append(qrContainer);
-
-      // Reveal section
       qrSection.style.display = "flex";
     }
 
     function downloadQR() {
       if(qrCode) {
-        qrCode.download({ name: "qr-code", extension: "png" });
+        qrCode.download({ name: "qr_code", extension: "png" });
       }
     }
 
@@ -286,7 +246,7 @@
       qrContainer.innerHTML = "";
     }
     
-    // Enter key trigger
+    // Allow 'Enter' key to trigger generation
     textInput.addEventListener("keypress", (e) => {
       if(e.key === "Enter") generateQR();
     });
