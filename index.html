@@ -19,19 +19,71 @@
       background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 100%);
       color: #e0e0e0;
       min-height: 100vh;
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      padding: 20px;
+      display: flex; 
+      justify-content: center; 
+      align-items: flex-start;
+      padding: 40px 20px;
+      overflow-x: hidden;
     }
 
-    /* --- GLASS TERMINAL CONTAINER --- */
-    .glass-terminal {
-      width: 100%; max-width: 440px;
-      display: flex; flex-direction: column; gap: 20px;
+    /* --- LAYOUT GRID --- */
+    .app-layout {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        align-items: flex-start;
+        justify-content: center;
+        width: 100%;
+        max-width: 900px;
+        position: relative;
+    }
+
+    /* --- GLASS STYLING --- */
+    .glass-card {
       background: rgba(20, 20, 20, 0.75); 
       backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-      padding: 30px; border-radius: 0px; 
+      padding: 30px; 
+      border-radius: 0px; 
+      display: flex; flex-direction: column; gap: 20px;
+    }
+
+    /* Main Window */
+    .main-window {
+        width: 100%;
+        max-width: 420px;
+        z-index: 2;
+    }
+
+    /* Custom Sidebar (Desktop Only) */
+    .sidebar-container {
+        width: 380px;
+        display: none; /* Hidden by default, JS toggles this */
+        opacity: 0;
+        transform: translateX(-20px);
+        transition: all 0.4s ease;
+    }
+    
+    .sidebar-container.visible {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* --- MOBILE HYBRID LOGIC --- */
+    /* This container holds the custom options. 
+       JS will move this entire <div> between the Main Card and the Sidebar. */
+    #custom-options-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+    }
+
+    /* On Mobile, hide the sidebar slot completely */
+    @media (max-width: 900px) {
+        .app-layout { flex-direction: column; align-items: center; }
+        .sidebar-container { display: none !important; }
     }
 
     h1 {
@@ -41,7 +93,7 @@
     }
     h1::after { content: '_'; animation: blink 1s infinite; }
 
-    /* --- MODE TABS --- */
+    /* --- UI ELEMENTS --- */
     .mode-switch { display: flex; gap: 0; border: 1px solid #333; margin-bottom: 10px; }
     .mode-btn {
       flex: 1; background: rgba(0,0,0,0.5); color: #666;
@@ -50,11 +102,7 @@
     }
     .mode-btn.active { background: #e0e0e0; color: #000; }
 
-    /* --- INPUTS --- */
-    label {
-      font-size: 0.75rem; color: #888; margin-bottom: 8px;
-      display: block; text-transform: uppercase; letter-spacing: 1px;
-    }
+    label { font-size: 0.75rem; color: #888; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 1px; }
     input[type="text"], select, input[type="file"] {
       background: rgba(0, 0, 0, 0.5); border: 1px solid #333;
       color: #fff; font-size: 0.9rem; padding: 14px;
@@ -69,15 +117,10 @@
       border: 1px solid #333; margin-bottom: 10px; cursor: pointer; transition: 0.2s;
     }
     .toggle-label { font-size: 0.8rem; font-weight: bold; color: #ccc; }
-    .toggle-status {
-      font-size: 0.7rem; background: #000; padding: 4px 8px;
-      border: 1px solid #333; color: #555;
-    }
-    .toggle-row:hover { border-color: #666; }
+    .toggle-status { font-size: 0.7rem; background: #000; padding: 4px 8px; border: 1px solid #333; color: #555; }
     .toggle-row.active { border-color: #00ff41; background: rgba(0, 255, 65, 0.05); }
     .toggle-row.active .toggle-status { background: #00ff41; color: #000; border-color: #00ff41; }
 
-    /* --- SUB-OPTIONS --- */
     .sub-options {
       display: none; flex-direction: column; gap: 15px; padding: 15px;
       border-left: 2px solid #333; background: rgba(0,0,0,0.2); margin-bottom: 15px;
@@ -85,39 +128,22 @@
 
     /* --- GRADIENT TOOLS --- */
     .gradient-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-    .btn-add-color {
-        background: #333; color: #fff; border: none; padding: 5px 10px;
-        font-size: 0.7rem; cursor: pointer;
-    }
-    .btn-add-color:hover { background: #00ff41; color: #000; }
+    .btn-add-color { background: #333; color: #fff; border: none; padding: 5px 10px; font-size: 0.7rem; cursor: pointer; }
     .color-list { display: flex; flex-direction: column; gap: 8px; }
     .color-row { display: flex; gap: 10px; align-items: center; }
-    input[type="color"] {
-      -webkit-appearance: none; border: 1px solid #333;
-      width: 100%; height: 35px; background: none; padding: 0; cursor: pointer;
-    }
+    input[type="color"] { -webkit-appearance: none; border: 1px solid #333; width: 100%; height: 35px; background: none; padding: 0; cursor: pointer; }
 
-    /* --- BUTTONS --- */
     button.action-btn {
-      background: #eee; color: #000; border: none;
-      padding: 16px; border-radius: 0px; font-weight: 900;
-      text-transform: uppercase; cursor: pointer; letter-spacing: 1px;
-      width: 100%; margin-top: 10px;
+      background: #eee; color: #000; border: none; padding: 16px; border-radius: 0px; font-weight: 900;
+      text-transform: uppercase; cursor: pointer; letter-spacing: 1px; width: 100%; margin-top: 10px;
     }
-    button.action-btn:hover { background: #fff; }
-
-    .btn-outline {
-      background: transparent; color: #fff; border: 1px solid #444;
-      padding: 10px; cursor: pointer;
-    }
+    
+    .btn-outline { background: transparent; color: #fff; border: 1px solid #444; padding: 10px; cursor: pointer; }
     .btn-small { width: auto; padding: 0 15px; height: 35px; }
 
-    /* --- OUTPUT --- */
-    #custom-panel { display: none; flex-direction: column; gap: 5px; margin-top: 10px; }
     #qr-section {
       display: none; flex-direction: column; gap: 20px;
-      margin-top: 10px; border-top: 1px dashed #333;
-      padding-top: 25px; align-items: center;
+      margin-top: 10px; border-top: 1px dashed #333; padding-top: 25px; align-items: center;
     }
     #canvas-container { border: 1px solid #333; padding: 10px; background: #000; }
     #canvas-container canvas { width: 240px !important; height: 240px !important; }
@@ -128,8 +154,10 @@
 </head>
 <body>
 
-  <div class="glass-terminal">
-    <h1>QR_Code_Generator</h1>
+<div class="app-layout">
+  
+  <div class="glass-card main-window" id="main-card">
+    <h1>QR_CODE_GENERATOR</h1>
 
     <div>
       <label>Operation_Mode</label>
@@ -153,70 +181,8 @@
       </select>
     </div>
 
-    <div id="custom-panel">
-      
-      <div class="toggle-row" onclick="toggleFeature('gradient')">
-        <span class="toggle-label">>> MODULE: COLOR_ENGINE</span>
-        <span class="toggle-status" id="status-gradient">[ OFF ]</span>
-      </div>
-      <div class="sub-options" id="opt-gradient">
-        <div>
-           <label>Fade_Type</label>
-           <select id="gradientType">
-              <option value="linear">Linear_Fade (45°)</option>
-              <option value="radial">Radial_Bloom (Center)</option>
-            </select>
-        </div>
-        <div>
-            <div class="gradient-header">
-                <label style="margin:0">Gradient_Stops</label>
-                <button class="btn-add-color" onclick="addColor()">[+] ADD</button>
-            </div>
-            <div class="color-list" id="colorList">
-              <div class="color-row"><input type="color" value="#00ff41" class="color-stop"><button class="btn-outline btn-small" onclick="removeColor(this)">X</button></div>
-              <div class="color-row"><input type="color" value="#008f11" class="color-stop"><button class="btn-outline btn-small" onclick="removeColor(this)">X</button></div>
-            </div>
-        </div>
-      </div>
+    <div id="mobile-custom-slot"></div>
 
-      <div class="toggle-row" onclick="toggleFeature('corners')">
-        <span class="toggle-label">>> MODULE: CORNER_SHAPES</span>
-        <span class="toggle-status" id="status-corners">[ OFF ]</span>
-      </div>
-      <div class="sub-options" id="opt-corners">
-        <label>Corner_Square_Style</label>
-        <select id="cornerSquareStyle">
-          <option value="square">Square</option>
-          <option value="dot">Dot</option>
-          <option value="extra-rounded">Rounded</option>
-        </select>
-        <label style="margin-top:10px">Corner_Dot_Style</label>
-        <select id="cornerDotStyle">
-          <option value="square">Square</option>
-          <option value="dot">Dot</option>
-        </select>
-      </div>
-
-      <div class="toggle-row" onclick="toggleFeature('logo')">
-        <span class="toggle-label">>> MODULE: BRAND_IDENTITY (LOGO)</span>
-        <span class="toggle-status" id="status-logo">[ OFF ]</span>
-      </div>
-      <div class="sub-options" id="opt-logo">
-        <label>Upload_File (.PNG recommended)</label>
-        <input type="file" id="logoInput" accept="image/*">
-      </div>
-
-      <div class="toggle-row" onclick="toggleFeature('background')">
-        <span class="toggle-label">>> MODULE: BACKDROP_IMG</span>
-        <span class="toggle-status" id="status-background">[ OFF ]</span>
-      </div>
-      <div class="sub-options" id="opt-background">
-        <label>Upload_Backdrop</label>
-        <input type="file" id="bgInput" accept="image/*">
-      </div>
-
-    </div>
-    
     <button class="action-btn" onclick="generateQR()">>> EXECUTE</button>
 
     <div id="qr-section">
@@ -228,38 +194,138 @@
     </div>
   </div>
 
-  <script>
+  <div class="glass-card sidebar-container" id="sidebar-card">
+      <label style="color:#00ff41; border-bottom:1px solid #333; padding-bottom:10px;">>> ADVANCED_CONFIGURATION</label>
+      
+      <div id="desktop-custom-slot"></div>
+  </div>
+
+</div>
+
+<div id="custom-options-wrapper" style="display:none;">
+    
+    <div class="toggle-row" onclick="toggleFeature('gradient')">
+      <span class="toggle-label">>> MODULE: COLOR_ENGINE</span>
+      <span class="toggle-status" id="status-gradient">[ OFF ]</span>
+    </div>
+    <div class="sub-options" id="opt-gradient">
+      <div>
+          <label>Fade_Type</label>
+          <select id="gradientType">
+            <option value="linear">Linear_Fade (45°)</option>
+            <option value="radial">Radial_Bloom (Center)</option>
+          </select>
+      </div>
+      <div>
+          <div class="gradient-header">
+              <label style="margin:0">Gradient_Stops</label>
+              <button class="btn-add-color" onclick="addColor()">[+] ADD</button>
+          </div>
+          <div class="color-list" id="colorList">
+            <div class="color-row"><input type="color" value="#00ff41" class="color-stop"><button class="btn-outline btn-small" onclick="removeColor(this)">X</button></div>
+            <div class="color-row"><input type="color" value="#008f11" class="color-stop"><button class="btn-outline btn-small" onclick="removeColor(this)">X</button></div>
+          </div>
+      </div>
+    </div>
+
+    <div class="toggle-row" onclick="toggleFeature('corners')">
+      <span class="toggle-label">>> MODULE: CORNER_SHAPES</span>
+      <span class="toggle-status" id="status-corners">[ OFF ]</span>
+    </div>
+    <div class="sub-options" id="opt-corners">
+      <label>Corner_Square_Style</label>
+      <select id="cornerSquareStyle">
+        <option value="square">Square</option>
+        <option value="dot">Dot</option>
+        <option value="extra-rounded">Rounded</option>
+      </select>
+      <label style="margin-top:10px">Corner_Dot_Style</label>
+      <select id="cornerDotStyle">
+        <option value="square">Square</option>
+        <option value="dot">Dot</option>
+      </select>
+    </div>
+
+    <div class="toggle-row" onclick="toggleFeature('logo')">
+      <span class="toggle-label">>> MODULE: BRAND_IDENTITY</span>
+      <span class="toggle-status" id="status-logo">[ OFF ]</span>
+    </div>
+    <div class="sub-options" id="opt-logo">
+      <label>Upload_File (Auto-Tint)</label>
+      <input type="file" id="logoInput" accept="image/*">
+    </div>
+
+    <div class="toggle-row" onclick="toggleFeature('background')">
+      <span class="toggle-label">>> MODULE: BACKDROP_IMG</span>
+      <span class="toggle-status" id="status-background">[ OFF ]</span>
+    </div>
+    <div class="sub-options" id="opt-background">
+      <label>Upload_Backdrop</label>
+      <input type="file" id="bgInput" accept="image/*">
+    </div>
+</div>
+
+<script>
     let currentMode = 'standard'; 
     let qrCode;
-    
-    // Feature Flags
-    let features = {
-      gradient: false,
-      corners: false,
-      logo: false,
-      background: false
-    };
+    let features = { gradient: false, corners: false, logo: false, background: false };
 
-    // UI REFS
-    const customPanel = document.getElementById('custom-panel');
+    // DOM REFS
+    const customWrapper = document.getElementById('custom-options-wrapper');
+    const mobileSlot = document.getElementById('mobile-custom-slot');
+    const desktopSlot = document.getElementById('desktop-custom-slot');
+    const sidebarCard = document.getElementById('sidebar-card');
     const btnStandard = document.getElementById('btn-standard');
     const btnCustom = document.getElementById('btn-custom');
-    
-    // --- MODE SWITCH ---
-    function setMode(mode) {
-      currentMode = mode;
-      if (mode === 'standard') {
-        customPanel.style.display = 'none';
-        btnStandard.classList.add('active');
-        btnCustom.classList.remove('active');
-      } else {
-        customPanel.style.display = 'flex';
-        btnStandard.classList.remove('active');
-        btnCustom.classList.add('active');
-      }
+
+    // --- RESPONSIVE LAYOUT ENGINE ---
+    function updateLayout() {
+        const isDesktop = window.innerWidth > 900;
+        
+        if (isDesktop) {
+            // Move options to sidebar
+            if (desktopSlot.children.length === 0) {
+                desktopSlot.appendChild(customWrapper);
+            }
+            // Show/Hide sidebar based on mode
+            sidebarCard.style.display = (currentMode === 'custom') ? 'flex' : 'none';
+            if(currentMode === 'custom') setTimeout(() => sidebarCard.classList.add('visible'), 10);
+            
+        } else {
+            // Move options to main card (Mobile)
+            if (mobileSlot.children.length === 0) {
+                mobileSlot.appendChild(customWrapper);
+            }
+            // Hide sidebar completely
+            sidebarCard.style.display = 'none';
+            sidebarCard.classList.remove('visible');
+            // Show wrapper if custom
+            customWrapper.style.display = (currentMode === 'custom') ? 'flex' : 'none';
+        }
     }
 
-    // --- TOGGLE LOGIC ---
+    // Listen for resize
+    window.addEventListener('resize', updateLayout);
+
+    // --- MODE SWITCH ---
+    function setMode(mode) {
+        currentMode = mode;
+        
+        if (mode === 'standard') {
+            btnStandard.classList.add('active');
+            btnCustom.classList.remove('active');
+            customWrapper.style.display = 'none';
+            sidebarCard.classList.remove('visible');
+            setTimeout(() => sidebarCard.style.display = 'none', 300); // Wait for fade out
+        } else {
+            btnStandard.classList.remove('active');
+            btnCustom.classList.add('active');
+            customWrapper.style.display = 'flex';
+            updateLayout(); // Trigger layout check to decide where to show it
+        }
+    }
+
+    // --- TOGGLES ---
     function toggleFeature(feature) {
       features[feature] = !features[feature];
       const uiRow = document.querySelector(`.toggle-row[onclick="toggleFeature('${feature}')"]`);
@@ -301,6 +367,34 @@
         else alert("Need at least 1 color.");
     }
 
+    // --- SMART LOGO TINT ---
+    function tintLogo(imageSrc, gradientConfig) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                ctx.globalCompositeOperation = "source-in";
+                
+                let grad;
+                if(gradientConfig.type === "linear") {
+                    grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                } else {
+                    grad = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width/2);
+                }
+                gradientConfig.colorStops.forEach(stop => grad.addColorStop(stop.offset, stop.color));
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL());
+            };
+            img.src = imageSrc;
+        });
+    }
+
     // --- GENERATE ---
     async function generateQR() {
       const text = document.getElementById("textInput").value.trim();
@@ -310,7 +404,6 @@
       if (!text) return alert("NO INPUT DETECTED");
       qrContainer.innerHTML = "";
       
-      // 1. Base Config
       let options = {
         width: 1000, height: 1000, type: "canvas", data: text,
         qrOptions: { typeNumber:0, errorCorrectionLevel:"Q" },
@@ -321,36 +414,30 @@
         imageOptions: { crossOrigin: "anonymous", margin: 10, imageSize: 0.4 }
       };
 
-      // 2. Custom Overrides
       if (currentMode === 'custom') {
-        
-        // A. Gradient
+        let gradConf = null;
         if (features.gradient) {
-           const gradConf = getGradientConfig();
+           gradConf = getGradientConfig();
            options.dotsOptions.gradient = gradConf;
            options.cornersSquareOptions.color = gradConf.colorStops[0].color;
            options.cornersDotOptions.color = gradConf.colorStops[0].color;
         }
-
-        // B. Corners
         if (features.corners) {
           options.cornersSquareOptions.type = document.getElementById('cornerSquareStyle').value;
           options.cornersDotOptions.type = document.getElementById('cornerDotStyle').value;
         }
-
-        // C. Logo (Async)
         if (features.logo) {
             const logoFile = document.getElementById('logoInput').files[0];
             if (logoFile) {
-                options.image = await new Promise(r => {
+                let logoData = await new Promise(r => {
                     const reader = new FileReader();
                     reader.onload = (e) => r(e.target.result);
                     reader.readAsDataURL(logoFile);
                 });
+                if(features.gradient && gradConf) logoData = await tintLogo(logoData, gradConf);
+                options.image = logoData;
             }
         }
-
-        // D. Background (Async)
         if (features.background) {
             const bgFile = document.getElementById('bgInput').files[0];
             if (bgFile) {
@@ -359,39 +446,27 @@
                     reader.onload = (e) => r(e.target.result);
                     reader.readAsDataURL(bgFile);
                 });
-                // When using a background image, we usually want the background color transparent
                 options.backgroundOptions = { color: "transparent" };
-                // NOTE: qr-code-styling doesn't strictly support "backgroundImage" prop, 
-                // so we handle it by CSS on the container or canvas usually, 
-                // BUT this library supports it via `backgroundOptions` if updated, 
-                // or we rely on the library treating transparent BG correctly.
-                // *Hack:* We will apply it to the container div for preview.
                 qrContainer.style.backgroundImage = `url(${bgUrl})`;
                 qrContainer.style.backgroundSize = 'cover';
-            } else {
-                qrContainer.style.backgroundImage = 'none';
-            }
-        } else {
-            // Reset if feature is OFF
-            qrContainer.style.backgroundImage = 'none';
-        }
-      } else {
-          // Standard Mode Reset
-          qrContainer.style.backgroundImage = 'none';
-      }
+            } else { qrContainer.style.backgroundImage = 'none'; }
+        } else { qrContainer.style.backgroundImage = 'none'; }
+      } else { qrContainer.style.backgroundImage = 'none'; }
 
-      // 3. Render
       qrCode = new QRCodeStyling(options);
       qrCode.append(qrContainer);
       document.getElementById("qr-section").style.display = "flex";
     }
 
-    function downloadQR() { if(qrCode) qrCode.download({name:"qr_master_v6", extension:"png"}); }
+    function downloadQR() { if(qrCode) qrCode.download({name:"qr_master_v8", extension:"png"}); }
     function resetApp() { 
         document.getElementById("textInput").value=""; 
         document.getElementById("qr-section").style.display="none"; 
         document.getElementById("canvas-container").innerHTML=""; 
     }
-  </script>
+
+    // Init Logic on Load
+    updateLayout();
+</script>
 </body>
 </html>
